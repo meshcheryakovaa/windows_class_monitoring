@@ -109,7 +109,7 @@ def require_windows():
 
 
 class DataBlob(ctypes.Structure):
-    _fields_ = [("cbData", wintypes.DWORD), ("pbData", ctypes.POINTER(ctypes.c_ubyte))]
+    _fields_ = [("cbData", ctypes.c_uint32), ("pbData", ctypes.POINTER(ctypes.c_ubyte))]
 
 
 def dpapi(data: bytes, decrypt=False):
@@ -152,9 +152,11 @@ def load_token():
 
 
 class PowerStatus(ctypes.Structure):
-    _fields_ = [("ACLineStatus", wintypes.BYTE), ("BatteryFlag", wintypes.BYTE),
-                ("BatteryLifePercent", wintypes.BYTE), ("SystemStatusFlag", wintypes.BYTE),
-                ("BatteryLifeTime", wintypes.DWORD), ("BatteryFullLifeTime", wintypes.DWORD)]
+    # BYTE in ctypes.wintypes was signed in older Python versions. The Windows
+    # contract uses unsigned bytes and 32-bit DWORDs, including the 255 sentinels.
+    _fields_ = [("ACLineStatus", ctypes.c_uint8), ("BatteryFlag", ctypes.c_uint8),
+                ("BatteryLifePercent", ctypes.c_uint8), ("SystemStatusFlag", ctypes.c_uint8),
+                ("BatteryLifeTime", ctypes.c_uint32), ("BatteryFullLifeTime", ctypes.c_uint32)]
 
 
 def decode_power(status):

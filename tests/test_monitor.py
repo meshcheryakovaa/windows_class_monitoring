@@ -78,6 +78,12 @@ class ConfigTests(IsolatedTest):
 
 
 class PowerTests(unittest.TestCase):
+    def test_windows_power_structure_has_fixed_unsigned_layout(self):
+        self.assertEqual(ctypes.sizeof(monitor.PowerStatus), 12)
+        status = monitor.PowerStatus()
+        status.BatteryFlag = 255
+        self.assertEqual(status.BatteryFlag, 255)
+
     def decode(self, percent=42, flags=0, ac=0, remaining=3600):
         status = monitor.PowerStatus()
         status.BatteryLifePercent = percent
