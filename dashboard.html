@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Заряд • Мониторинг ноутбуков</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1218;--surface:#131d27;--line:#263541;--muted:#9aaebd;--text:#ecf4f8;--green:#72e0ae;--amber:#f4c875;--red:#ff8b91}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button,input,select{border:1px solid var(--line);border-radius:10px;padding:10px 13px;background:#182631;color:var(--text)}button:hover{border-color:#6d8799}input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--green);outline-offset:3px}input{min-width:0}a{color:var(--green)}.primary{background:var(--green);color:#08271c;border-color:var(--green);font-weight:650}.ghost{background:transparent}.wrap{max-width:1600px;margin:auto;padding:34px clamp(18px,4vw,64px)}header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:30px}.brand{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:650}h1{font-size:clamp(27px,4vw,40px);line-height:1.2;letter-spacing:-.04em;margin:6px 0}p{margin:8px 0}.muted{color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}.metric{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px 22px}.metric span{color:var(--muted);font-size:13px}.metric strong{display:block;font-size:32px;line-height:1.5;font-weight:600;letter-spacing:-.04em}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px}.toolbar input{flex:1;min-width:190px}.toolbar label{font-size:13px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}.card{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:22px;min-width:0;position:relative}.card.low{border-color:#88494f}.card.stale{border-style:dashed}.card-top{display:flex;align-items:start;justify-content:space-between;gap:10px}.device-name{font-size:17px;font-weight:650;overflow-wrap:anywhere;line-height:1.3;margin:0 0 4px}.host{color:var(--muted);font-size:12px;overflow-wrap:anywhere}.badge{white-space:nowrap;font-size:11px;padding:3px 7px;background:#20352f;border-radius:6px;color:var(--green)}.stale .badge{background:#2b3038;color:var(--muted)}.level{display:flex;align-items:baseline;gap:4px;margin:24px 0 12px}.level strong{font-size:52px;line-height:1;font-weight:550;letter-spacing:-.06em}.level span{font-size:20px;color:var(--muted)}.bar{height:7px;border-radius:10px;background:#293641;overflow:hidden}.fill{height:100%;background:var(--green);border-radius:10px}.low .fill{background:var(--red)}.medium .fill{background:var(--amber)}.stale .fill{background:#718291}.power{margin:14px 0 20px;font-size:13px;color:var(--green)}.low .power{color:var(--red)}.stale .power{color:var(--muted)}.card-foot{border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.device-error{color:var(--red);font-size:12px;margin-top:8px}.statusline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin:24px 0 10px;flex-wrap:wrap}.notice{border:1px solid #765f33;background:#302719;color:var(--amber);padding:12px 16px;border-radius:10px;margin-bottom:18px}.error{border-color:#88494f;background:#301d24;color:#ffb3b7}.empty{border:1px dashed var(--line);border-radius:16px;padding:65px 24px;text-align:center}.empty h2{font-size:21px;margin:0 0 10px}.empty p{color:var(--muted);max-width:540px;margin:0 auto 22px}.footer{font-size:12px;color:var(--muted);margin-top:30px}.hidden,[hidden]{display:none!important}dialog{color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:18px;width:min(560px,calc(100% - 30px));padding:27px}dialog::backdrop{background:#000a;backdrop-filter:blur(4px)}dialog h2{margin:0 0 10px}dialog label{display:block;margin:18px 0 6px;font-size:13px}dialog input{width:100%}dialog .actions{margin-top:24px;justify-content:flex-end}.hint{font-size:12px;color:var(--muted)}.dialog-head{display:flex;justify-content:space-between;gap:10px}.warn-text{color:var(--red)}
+@media(max-width:700px){header{align-items:start;flex-direction:column}.summary{grid-template-columns:repeat(2,1fr)}.metric{padding:12px 16px}.grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.toolbar select{flex:1;min-width:130px}.wrap{padding-top:24px}.metric strong{font-size:28px}}
+.card-top>div{min-width:0;flex:1}
+</style>
+</head>
+<body>
+<main class="wrap">
+ <header><div><div class="brand">Windows Class Monitoring</div><h1>Заряд под контролем</h1><p class="muted">Все ноутбуки на одном экране</p></div>
+ <div class="actions"><button id="refresh" disabled>Обновить</button><button id="fullscreen" class="ghost">На весь экран</button><button id="connect" class="primary">Подключить Диск</button></div></header>
+ <div id="demoNotice" class="notice" hidden>Демонстрация интерфейса. Ниже показаны вымышленные устройства.</div>
+ <div id="error" class="notice error" role="alert" hidden></div>
+ <section class="summary" aria-label="Сводка">
+  <div class="metric"><span>Устройств</span><strong id="total">0</strong></div>
+  <div class="metric"><span>Свежие данные</span><strong id="fresh" style="color:var(--green)">0</strong></div>
+  <div class="metric"><span>Нужно питание · &lt;20%</span><strong id="low" style="color:var(--red)">0</strong></div>
+  <div class="metric"><span>Нет свежих данных</span><strong id="stale">0</strong></div>
+ </section>
+ <div class="toolbar"><input id="search" type="search" aria-label="Поиск компьютера" placeholder="Найти компьютер или название…">
+ <select id="filter" aria-label="Фильтр"><option value="all">Все устройства</option><option value="low">Нужно питание</option><option value="stale">Нет свежих данных</option><option value="ac">Подключены к сети</option></select>
+ <select id="sort" aria-label="Сортировка"><option value="charge">Сначала низкий заряд</option><option value="name">По названию</option><option value="updated">По времени измерения</option></select></div>
+ <section id="grid" class="grid" aria-label="Компьютеры"></section>
+ <section id="empty" class="empty"><h2 id="emptyTitle">Подключите Яндекс Диск</h2><p id="emptyText">Агенты отправляют заряд каждые 5 минут. Подключите тот же аккаунт и OAuth-приложение, которые используются на ноутбуках.</p><button id="demo">Посмотреть демонстрацию</button></section>
+ <div class="statusline" aria-live="polite"><span id="status">Ожидание подключения</span><span>Обновление панели: 1 минута</span></div>
+ <p class="footer">Показывается последнее измерение. Спящий или выключенный ноутбук не отправляет данные. Токен хранится только в памяти этой вкладки.</p>
+</main>
+<dialog id="settings"><form id="settingsForm">
+ <div class="dialog-head"><h2>Подключение к Диску</h2><button id="closeSettings" type="button" class="ghost" aria-label="Закрыть">✕</button></div>
+ <p class="muted">Один аккаунт Яндекса и одно OAuth-приложение для агентов и панели.</p>
+ <label for="clientId">Client ID · необязательно</label><input id="clientId" autocomplete="off" placeholder="Для открытия страницы выдачи токена">
+ <p><button id="getToken" type="button" class="ghost">Получить OAuth-токен</button></p>
+ <label for="token">OAuth-токен</label><input id="token" type="password" autocomplete="off" required placeholder="Вставьте токен с доступом к папке приложения">
+ <label for="diskPath">Папка устройств</label><input id="diskPath" value="app:/windows-class-monitoring/devices" required>
+ <p class="hint">Разрешение приложения: cloud_api:disk.app_folder. Если открыт локальный HTML и браузер блокирует запросы, попробуйте открыть панель через локальный HTTP-сервер (инструкция в README).</p>
+ <p id="settingsError" class="warn-text" role="alert"></p>
+ <div class="actions"><button id="disconnect" type="button" class="ghost">Отключить</button><button type="submit" class="primary">Подключить</button></div>
+</form></dialog>
+<script>
+'use strict';
+const API='https://cloud-api.yandex.net/v1/disk/resources';
+const DEFAULT_PATH='app:/windows-class-monitoring/devices';
+const $=id=>document.getElementById(id);
+let token='',diskPath=DEFAULT_PATH,devices=[],cache=new Map(),busy=false,generation=0,demo=false,lastRefresh=null;
+try{diskPath=localStorage.getItem('wcm.diskPath')||DEFAULT_PATH;$('clientId').value=localStorage.getItem('wcm.clientId')||'';}catch{}
+$('diskPath').value=diskPath;
+function validatePath(path){return path.startsWith('app:/')&&path.length<=300&&path.slice(5).split('/').every(p=>p&&p!=='.'&&p!=='..'&&!/[:\\\x00-\x1f]/.test(p));}
+async function request(url,authToken){
+ if(new URL(url).protocol!=='https:')throw Error('Получена небезопасная ссылка');
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+ try{
+  const response=await fetch(url,{headers:authToken?{Authorization:'OAuth '+authToken,Accept:'application/json'}:{},signal:controller.signal,referrerPolicy:'no-referrer',cache:'no-store'});
+  if(!response.ok){const e=Error(({401:'Токен недействителен или истёк',403:'Нет доступа к папке приложения',404:'Папка ещё не создана. Запустите агент и выполните send',429:'Слишком много запросов. Подождите следующего обновления'}[response.status])||('Яндекс Диск: HTTP '+response.status));e.status=response.status;throw e;}
+  return await response.json();
+ }catch(e){if(e.name==='AbortError')throw Error('Превышено время ожидания Диска');if(e instanceof TypeError)throw Error('Нет связи с Диском или браузер блокирует запрос (CORS). См. README');throw e;}finally{clearTimeout(timer);}
+}
+async function listFiles(authToken,path){
+ let offset=0,items=[];
+ while(true){
+  const response=await request(API+'?'+new URLSearchParams({path,limit:'100',offset:String(offset),sort:'name'}),authToken);
+  if(response.type!=='dir')throw Error('Указанный путь не является папкой');
+  const batch=response._embedded?.items;
+  if(!Array.isArray(batch))throw Error('Некорректный список файлов Диска');
+  items.push(...batch.filter(f=>f.type==='file'&&/\.json$/i.test(f.name)));
+  offset+=batch.length;
+  if(offset>=Number(response._embedded.total)||batch.length===0)break;
+ }
+ return items;
+}
+function validateDevice(data){
+ if(!data||data.schema!=='windows-class-monitoring/v1'||typeof data.device_id!=='string'||!data.device_id||typeof data.computer_name!=='string'||!Number.isFinite(Date.parse(data.measured_at)))throw Error('Файл устройства имеет неверный формат');
+ if(data.battery_percent!==null&&(!Number.isFinite(data.battery_percent)||data.battery_percent<0||data.battery_percent>100))throw Error('Неверный процент заряда');
+ if(typeof data.display_name!=='string'||typeof data.agent_version!=='string'||!Number.isFinite(data.interval_seconds)||data.interval_seconds<30||data.interval_seconds>86400)throw Error('Неверные настройки устройства');
+ if(![true,false,null].includes(data.ac_connected)||![true,false,null].includes(data.charging)||![true,false,null].includes(data.battery_present))throw Error('Неверные данные питания');
+ return data;
+}
+async function refresh(){
+ if(busy||!token||demo)return;
+ busy=true;$('refresh').disabled=true;$('status').textContent='Получение данных с Диска…';
+ const mine=generation,authToken=token,path=diskPath;
+ try{
+  const files=await listFiles(authToken,path),next=new Map();let position=0,failures=0;
+  async function worker(){
+   while(position<files.length){
+    const file=files[position++],key=file.path||file.name,etag=file.sha256||file.md5||file.modified+':'+file.size,old=cache.get(key);
+    if(mine!==generation)return;
+    if(old?.etag===etag&&!old.error){next.set(key,old);continue;}
+    try{
+     const link=await request(API+'/download?'+new URLSearchParams({path:file.path||path+'/'+file.name}),authToken);
+     if(!link.href)throw Error('Нет ссылки скачивания');
+     const data=validateDevice(await request(link.href));
+     next.set(key,{etag,data,error:null});
+    }catch(e){failures++;next.set(key,{etag:null,data:old?.data||null,error:e.message,name:file.name});}
+   }
+  }
+  await Promise.all(Array.from({length:Math.min(3,files.length)},worker));
+  if(mine!==generation)return;
+  cache=next;devices=[...next.values()].filter(v=>v.data).map(v=>({...v.data,read_error:v.error}));lastRefresh=new Date();
+  $('error').hidden=!failures;
+  $('error').textContent=failures?`Не удалось прочитать файлов: ${failures}. Предыдущие данные сохранены. `+[...next.values()].find(v=>v.error)?.error:'';
+  $('status').textContent='Проверено в '+lastRefresh.toLocaleTimeString('ru-RU')+' · устройств: '+devices.length;
+  render();
+ }catch(e){if(mine===generation){$('error').hidden=false;$('error').textContent=e.message;$('status').textContent='Обновление не удалось'+(lastRefresh?' · последняя проверка '+lastRefresh.toLocaleTimeString('ru-RU'):'');}}
+ finally{busy=false;$('refresh').disabled=!token||demo;}
+}
+function ageMs(d){return Date.now()-Date.parse(d.measured_at);}
+function stale(d){const interval=Number(d.interval_seconds);return !!d.read_error||ageMs(d)>Math.max(900000,(Number.isFinite(interval)&&interval>0?interval:300)*3000);}
+function needsPower(d){return !stale(d)&&d.battery_present===true&&d.battery_percent!==null&&d.battery_percent<20&&d.ac_connected===false;}
+function ageText(d){const age=ageMs(d);if(age< -300000)return 'Проверьте часы ноутбука';const min=Math.floor(Math.max(0,age)/60000);if(min<1)return 'Только что';if(min<60)return min+' мин назад';if(min<1440)return Math.floor(min/60)+' ч назад';return Math.floor(min/1440)+' дн назад';}
+function nameOf(d){return d.display_name||d.computer_name;}
+function powerText(d){if(d.battery_present===false)return 'Стационарный ПК · батареи нет';if(d.charging===true)return '↗ Заряжается · питание подключено';if(d.ac_connected===true)return 'Питание подключено';if(d.ac_connected===false)return 'Работает от батареи';return 'Состояние питания неизвестно';}
+function element(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;}
+function render(){
+ $('total').textContent=devices.length;$('fresh').textContent=devices.filter(d=>!stale(d)).length;$('low').textContent=devices.filter(needsPower).length;$('stale').textContent=devices.filter(stale).length;
+ const search=$('search').value.toLocaleLowerCase('ru-RU'),filter=$('filter').value;
+ let visible=devices.filter(d=>(nameOf(d)+' '+d.computer_name).toLocaleLowerCase('ru-RU').includes(search)).filter(d=>filter==='all'||(filter==='low'&&needsPower(d))||(filter==='stale'&&stale(d))||(filter==='ac'&&d.ac_connected===true));
+ visible.sort((a,b)=>$('sort').value==='name'?nameOf(a).localeCompare(nameOf(b),'ru'):$('sort').value==='updated'?Date.parse(b.measured_at)-Date.parse(a.measured_at):(a.battery_percent??101)-(b.battery_percent??101)||nameOf(a).localeCompare(nameOf(b),'ru'));
+ $('grid').replaceChildren();
+ for(const d of visible){
+  const card=element('article','card'+(stale(d)?' stale':needsPower(d)?' low':d.battery_percent!==null&&d.battery_percent<40?' medium':''));
+  const top=element('div','card-top'),names=element('div');names.append(element('h2','device-name',nameOf(d)),element('div','host',d.computer_name));top.append(names,element('span','badge',stale(d)?'Нет свежих данных':'Данные свежие'));
+  const level=element('div','level');level.append(element('strong','',d.battery_percent===null?'—':String(d.battery_percent)),element('span','',d.battery_percent===null?'':'%'));
+  const bar=element('div','bar'),fill=element('div','fill');fill.style.width=(d.battery_percent??0)+'%';bar.append(fill);
+  const foot=element('div','card-foot'),date=element('span','',ageText(d));date.title=new Date(d.measured_at).toLocaleString('ru-RU');foot.append(date,element('span','','v'+(d.agent_version||'?')));
+  card.append(top,level,bar,element('div','power',powerText(d)),foot);
+  if(d.read_error)card.append(element('div','device-error','Не удалось обновить файл'));
+  $('grid').append(card);
+ }
+ $('empty').hidden=visible.length>0;
+ if(!visible.length){
+  $('emptyTitle').textContent=devices.length?'Ничего не найдено':token?'Устройства пока не появились':'Подключите Яндекс Диск';
+  $('emptyText').textContent=devices.length?'Измените поиск или фильтр.':token?'Запустите агент на ноутбуке и выполните .\\battery.ps1 send. Затем обновите панель.':'Подключите тот же аккаунт и OAuth-приложение, которые используются на ноутбуках.';
+ }
+ $('demo').hidden=!!token||demo;
+}
+function disconnect(){generation++;token='';devices=[];cache.clear();demo=false;lastRefresh=null;$('token').value='';$('demoNotice').hidden=true;$('error').hidden=true;$('refresh').disabled=true;$('connect').textContent='Подключить Диск';$('status').textContent='Ожидание подключения';render();}
+$('settingsForm').addEventListener('submit',async event=>{
+ event.preventDefault();if(busy){$('settingsError').textContent='Дождитесь завершения текущего обновления';return;}
+ const value=$('token').value.trim(),path=$('diskPath').value.trim();
+ if(!value||/\s/.test(value)){ $('settingsError').textContent='Введите OAuth-токен без пробелов';return;}
+ if(!validatePath(path)){ $('settingsError').textContent='Путь должен иметь вид app:/папка/devices';return;}
+ disconnect();token=value;diskPath=path;$('settingsError').textContent='';
+ try{localStorage.setItem('wcm.diskPath',path);localStorage.setItem('wcm.clientId',$('clientId').value.trim());}catch{}
+ $('connect').textContent='Подключение';$('settings').close();await refresh();
+});
+$('connect').addEventListener('click',()=>{$('settingsError').textContent='';$('settings').showModal();});
+$('closeSettings').addEventListener('click',()=>$('settings').close());
+$('disconnect').addEventListener('click',()=>{disconnect();$('settings').close();});
+$('getToken').addEventListener('click',()=>{const id=$('clientId').value.trim();if(!id){$('settingsError').textContent='Введите Client ID OAuth-приложения';return;}window.open('https://oauth.yandex.ru/authorize?'+new URLSearchParams({response_type:'token',client_id:id,scope:'cloud_api:disk.app_folder'}),'_blank','noopener,noreferrer');});
+$('refresh').addEventListener('click',refresh);
+$('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{$('status').textContent='Полноэкранный режим недоступен в этом браузере';}});
+for(const id of ['search','filter','sort'])$(id).addEventListener('input',render);
+$('demo').addEventListener('click',()=>{
+ disconnect();demo=true;$('demoNotice').hidden=false;$('demo').hidden=true;$('status').textContent='Демонстрационные данные';
+ devices=Array.from({length:12},(_,i)=>({schema:'windows-class-monitoring/v1',device_id:'demo-'+i,computer_name:'CAB43-NB'+String(i+1).padStart(2,'0'),display_name:i===0?'Ноутбук преподавателя':'Ноутбук '+String(i+1).padStart(2,'0'),battery_percent:[87,12,34,65,96,8,42,73,100,56,25,91][i],battery_present:true,charging:i%3===0,ac_connected:i%3===0,agent_version:i===3?'0.9.0':'1.0.0',interval_seconds:300,measured_at:new Date(Date.now()-(i===3?48:2+i%4)*60000).toISOString()}));render();
+});
+setInterval(refresh,60000);setInterval(render,15000);window.addEventListener('online',refresh);
+render();
+</script>
+</body></html>
